@@ -1,0 +1,158 @@
+{
+    "Price_chicken": {
+        "current": 65.0,
+        "predicted_7_days": [
+            65.0,
+            65.0,
+            65.5,
+            65.5,
+            66.0,
+            66.0,
+            66.0
+        ]
+    },
+    "Price_chili": {
+        "current": 140.0,
+        "predicted_7_days": [
+            142.0,
+            145.0,
+            148.0,
+            150.0,
+            155.0,
+            155.0,
+            160.0
+        ]
+    },
+    "Price_coriander": {
+        "current": 100.0,
+        "predicted_7_days": [
+            105.0,
+            108.0,
+            110.0,
+            115.0,
+            115.0,
+            118.0,
+            120.0
+        ]
+    },
+    "Price_egg": {
+        "current": 4.1,
+        "predicted_7_days": [
+            4.1,
+            4.1,
+            4.1,
+            4.1,
+            4.15,
+            4.15,
+            4.15
+        ]
+    },
+    "Price_garlic": {
+        "current": 90.0,
+        "predicted_7_days": [
+            89.0,
+            88.0,
+            86.5,
+            85.0,
+            85.0,
+            84.0,
+            83.0
+        ]
+    },
+    "Price_lime": {
+        "current": 1.5,
+        "predicted_7_days": [
+            1.55,
+            1.6,
+            1.65,
+            1.7,
+            1.75,
+            1.8,
+            1.85
+        ]
+    },
+    "Price_onion": {
+        "current": 35.0,
+        "predicted_7_days": [
+            34.5,
+            34.0,
+            33.5,
+            33.0,
+            32.5,
+            32.0,
+            32.0
+        ]
+    },
+    "Price_peanut": {
+        "current": 77.0,
+        "predicted_7_days": [
+            77.0,
+            77.0,
+            77.5,
+            77.5,
+            77.5,
+            78.0,
+            78.0
+        ]
+    },
+    "Price_pork": {
+        "current": 160.0,
+        "predicted_7_days": [
+            162.0,
+            164.0,
+            165.0,
+            166.5,
+            167.5,
+            168.0,
+            170.0
+        ]
+    },
+    "Price_shallot": {
+        "current": 68.0,
+        "predicted_7_days": [
+            67.5,
+            67.0,
+            66.5,
+            66.0,
+            65.5,
+            65.0,
+            64.0
+        ]
+    },
+    "Price_shrimp": {
+        "current": 205.0,
+        "predicted_7_days": [
+            205.0,
+            205.0,
+            205.0,
+            206.0,
+            206.0,
+            205.0,
+            205.0
+        ]
+    },
+    "Price_spring_onion": {
+        "current": 40.0,
+        "predicted_7_days": [
+            41.0,
+            42.0,
+            43.0,
+            44.0,
+            45.0,
+            46.0,
+            47.0
+        ]
+    },
+    "Price_tamarind_juice": {
+        "current": 115.0,
+        "predicted_7_days": [
+            115.0,
+            115.0,
+            115.0,
+            115.0,
+            115.0,
+            115.0,
+            115.0
+        ]
+    }
+}

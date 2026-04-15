@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 5 Cost-Optimized Menus</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        select {
+            padding: 10px 15px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .nav-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        
+        .nav-btn:hover { background-color: #2980b9; }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .menu-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Rank badge */
+        .rank-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #34495e;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        /* Rank 1 highlight */
+        .rank-1 {
+            background-color: #f1c40f;
+            color: #8a6d3b;
+            font-size: 16px;
+        }
+
+        .menu-image {
+            width: 100%;
+            height: 200px;
+            background-color: #e2e8f0;
+            object-fit: cover;
+        }
+
+        .menu-info {
+            padding: 20px;
+        }
+
+        .menu-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+        }
+
+        .ingredients-list {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            height: 40px; 
+            overflow: hidden;
+        }
+
+        .cost-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .cost-details {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .pct-badge {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        /* Percentage colors */
+        .pct-down { background-color: #e8f8f5; color: #27ae60; } /* Cost decreased (good) */
+        .pct-up { background-color: #fdedec; color: #e74c3c; }   /* Cost increased */
+        .pct-stable { background-color: #fdf2e9; color: #e67e22; } /* Stable */
+
+        .cost-breakdown {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Menu Value Prediction</h1>
+        <p>Ranking menus based on the highest expected cost reduction (Percentage Change)</p>
+        
+        <div class="controls">
+            <label for="daySelector"><strong>Select Forecast Day:</strong></label>
+            <select id="daySelector" onchange="renderMenus()">
+                <option value="0">Day 1 (Monday)</option>
+                <option value="1">Day 2 (Tuesday)</option>
+                <option value="2">Day 3 (Wednesday)</option>
+                <option value="3">Day 4 (Thursday)</option>
+                <option value="4">Day 5 (Friday)</option>
+                <option value="5">Day 6 (Saturday)</option>
+                <option value="6">Day 7 (Sunday)</option>
+            </select>
+            <a href="index.html" class="nav-btn">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="menu-grid" id="menuContainer"></div>
+
+    <script>
+        let globalPriceData = {};
+
+        const baseRecipes = [
+            {
+                name: "Kai Jeow Moo Sap (Pork Omelette)",
+                image: "images/kaijeow.jpg",
+                ingredients: "3 eggs, ground pork, green onion",
+                calculation: [
+                    { item: "Eggs (3 pcs)", key: "Price_egg", qty: 3 },
+                    { item: "Ground pork (50g)", key: "Price_pork", qty: 0.05 },
+                    { item: "Green onion (10g)", key: "Price_spring_onion", qty: 0.01 }
+                ]
+            },
+            {
+                name: "Larb Moo (Pork Salad)",
+                image: "images/larbmoo.jpg",
+                ingredients: "Ground pork, shallots, lime, green onion",
+                calculation: [
+                    { item: "Ground pork (300g)", key: "Price_pork", qty: 0.3 },
+                    { item: "Shallots (30g)", key: "Price_shallot", qty: 0.03 },
+                    { item: "Lime (1.5 pcs)", key: "Price_lime", qty: 1.5 },
+                    { item: "Green onion (20g)", key: "Price_spring_onion", qty: 0.02 }
+                ]
+            },
+            {
+                name: "Khao Pad Moo (Pork Fried Rice)",
+                image: "images/khaopad.jpg",
+                ingredients: "Pork, eggs, garlic",
+                calculation: [
+                    { item: "Pork (150g)", key: "Price_pork", qty: 0.15 },
+                    { item: "Eggs (2 pcs)", key: "Price_egg", qty: 2 },
+                    { item: "Garlic (15g)", key: "Price_garlic", qty: 0.015 }
+                ]
+            },
+            {
+                name: "Tom Yum Goong (Spicy Shrimp Soup)",
+                image: "images/tomyum.jpg",
+                ingredients: "Fresh shrimp, lime, chili",
+                calculation: [
+                    { item: "Fresh shrimp (300g)", key: "Price_shrimp", qty: 0.3 },
+                    { item: "Lime (2 pcs)", key: "Price_lime", qty: 2 },
+                    { item: "Chili (10g)", key: "Price_chili", qty: 0.01 }
+                ]
+            },
+            {
+                name: "Pad Kra Pao Moo Sap (Basil Pork)",
+                image: "images/kaprao.jpg",
+                ingredients: "Ground pork, garlic, chili, eggs",
+                calculation: [
+                    { item: "Eggs (2 pcs)", key: "Price_egg", qty: 2 },
+                    { item: "Pork (300g)", key: "Price_pork", qty: 0.3 },
+                    { item: "Garlic (15g)", key: "Price_garlic", qty: 0.015 },
+                    { item: "Chili (10g)", key: "Price_chili", qty: 0.01 }
+                ]
+            }
+        ];
+
+        async function initData() {
+            try {
+                const response = await fetch('predicted_prices.json');
+                globalPriceData = await response.json();
+                renderMenus(); 
+            } catch (error) {
+                console.error("Error loading data:", error);
+                document.getElementById('menuContainer').innerHTML = "<p style='text-align:center; color:red;'>Unable to fetch prices. Please run on Localhost.</p>";
+            }
+        }
+
+        function renderMenus() {
+            const dayIndex = parseInt(document.getElementById('daySelector').value);
+            const container = document.getElementById('menuContainer');
+            container.innerHTML = ''; 
+
+            let calculatedRecipes = [];
+
+            baseRecipes.forEach(recipe => {
+                let baseTotalCost = 0;
+                let predictedTotalCost = 0;
+                let breakdownHTML = "";
+
+                recipe.calculation.forEach(calc => {
+                    let currentPrice = 0;
+                    let predictedPrice = 0;
+
+                    if (globalPriceData[calc.key]) {
+                        currentPrice = globalPriceData[calc.key].current;
+                        if (globalPriceData[calc.key].predicted_7_days) {
+                            predictedPrice = globalPriceData[calc.key].predicted_7_days[dayIndex];
+                        }
+                    }
+                    
+                    let baseItemCost = currentPrice * calc.qty;
+                    let predictedItemCost = predictedPrice * calc.qty;
+
+                    baseTotalCost += baseItemCost;
+                    predictedTotalCost += predictedItemCost;
+                    
+                    breakdownHTML += `${calc.item}: ฿${predictedItemCost.toFixed(2)} (from ฿${baseItemCost.toFixed(2)})<br>`;
+                });
+
+                let finalBaseCost = baseTotalCost + 20; 
+                let finalPredictedCost = predictedTotalCost + 20;
+
+                let percentChange = ((finalPredictedCost - finalBaseCost) / finalBaseCost) * 100;
+
+                calculatedRecipes.push({
+                    name: recipe.name,
+                    image: recipe.image,
+                    ingredients: recipe.ingredients,
+                    finalCost: finalPredictedCost,
+                    baseCost: finalBaseCost,
+                    percentChange: percentChange,
+                    breakdown: breakdownHTML
+                });
+            });
+
+            calculatedRecipes.sort((a, b) => a.percentChange - b.percentChange);
+
+            calculatedRecipes.forEach((recipe, index) => {
+                let rankNumber = index + 1;
+                let rankClass = rankNumber === 1 ? 'rank-badge rank-1' : 'rank-badge';
+                let rankText = rankNumber === 1 ? '#1 Best Value' : `#${rankNumber}`;
+
+                let pctClass = '';
+                let pctSign = '';
+                
+                if (recipe.percentChange < -0.5) {
+                    pctClass = 'pct-down';
+                } else if (recipe.percentChange > 0.5) {
+                    pctClass = 'pct-up';
+                    pctSign = '+';
+                } else {
+                    pctClass = 'pct-stable';
+                    pctSign = (recipe.percentChange > 0 ? '+' : '');
+                }
+
+                let pctDisplay = `${pctSign}${recipe.percentChange.toFixed(2)}%`;
+
+                const cardHTML = `
+                    <div class="menu-card">
+                        <div class="${rankClass}">${rankText}</div>
+                        <img src="${recipe.image}" alt="${recipe.name}" class="menu-image">
+                        <div class="menu-info">
+                            <h3 class="menu-name">${recipe.name}</h3>
+                            <p class="ingredients-list"><strong>Ingredients:</strong> ${recipe.ingredients}</p>
+                            
+                            <div class="cost-container">
+                                <div class="cost-details">฿${recipe.finalCost.toFixed(2)}</div>
+                                <div class="pct-badge ${pctClass}">${pctDisplay}</div>
+                            </div>
+
+                            <p class="cost-breakdown"><strong>Cost Breakdown:</strong><br>${recipe.breakdown}</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        initData();
+    </script>
+</body>
+</html>
